@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: distributed-rate-limiter-app
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  redis:
+    image: redis:alpine
+    container_name: redis-rate-limiter
+    ports:
+      - "6379:6379"
