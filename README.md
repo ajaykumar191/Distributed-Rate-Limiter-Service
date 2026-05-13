@@ -1,25 +1,50 @@
 # Distributed Rate Limiter Service
 
-A production-style distributed rate limiter built using the **Token Bucket Algorithm** to regulate API traffic across multiple backend instances.
+A production-style **distributed rate limiter** built using the **Token Bucket Algorithm** to regulate API traffic across multiple backend instances.
+
+This service uses **Redis as a shared distributed store** and **Lua scripting for atomic operations**, ensuring consistency and scalability in a multi-instance environment.
+
+---
 
 ## Features
 
 - Distributed rate limiting using Redis
-- Token Bucket Algorithm
+- Token Bucket Algorithm implementation
 - Atomic Redis Lua scripting
 - Configurable per-route rate limiting
 - Express middleware integration
-- HTTP 429 handling
+- HTTP `429 Too Many Requests` handling
 - Dockerized deployment
-- Redis shared state management
+- Shared distributed state management
+- Production-style backend architecture
+
+---
 
 ## Tech Stack
 
-- Node.js
-- Express.js
-- Redis
-- Docker
-- REST APIs
+- **Node.js**
+- **Express.js**
+- **Redis**
+- **Docker**
+- **Lua Scripting**
+- **REST APIs**
+
+---
+
+## System Design
+
+### Flow
+
+1. Incoming request hits Express middleware
+2. Middleware checks Redis token bucket
+3. Lua script atomically:
+   - Refills tokens
+   - Consumes token if available
+4. Request is:
+   - **Allowed** → forwarded to API
+   - **Rejected** → returns HTTP `429`
+
+---
 
 ## Project Structure
 
@@ -32,37 +57,110 @@ src/
 ├── utils/
 ├── app.js
 └── server.js
+```
 
+---
 
+## API Endpoints
 
-API Endpoints
-Test API
+### Test API
+```http
 GET /api/test
-Strict API
+```
+
+### Strict Rate Limited API
+```http
 GET /api/strict
-Run Locally
-Install dependencies
+```
+
+---
+
+## Run Locally
+
+### 1. Install Dependencies
+
+```bash
 npm install
-Start Redis
+```
+
+### 2. Start Redis
+
+```bash
 docker run -d -p 6379:6379 redis
-Start Server
+```
+
+### 3. Start Development Server
+
+```bash
 npm run dev
-Run with Docker
+```
+
+---
+
+## Run with Docker
+
+```bash
 docker compose up --build
-Example Response
-Success
+```
+
+---
+
+## Example Responses
+
+### Success Response
+
+```json
 {
   "success": true,
   "message": "API request successful"
 }
-Rate Limited
+```
+
+### Rate Limited Response
+
+```json
 {
   "success": false,
   "message": "Too many requests. Please try again later."
 }
-Future Improvements
-Rate limit headers
-User-based throttling
-Metrics endpoint
-Sliding window algorithm
-Horizontal scaling support
+```
+
+---
+
+## Why Redis + Lua?
+
+Using Redis Lua scripting ensures **atomic execution**, preventing race conditions when multiple backend instances try to update token counts simultaneously.
+
+This makes the rate limiter **consistent, scalable, and safe for distributed systems**.
+
+---
+
+## Future Improvements
+
+- Rate limit response headers
+- User/IP-based throttling
+- Monitoring & metrics endpoint
+- Sliding Window algorithm
+- Dynamic configuration support
+- Horizontal scaling optimizations
+- API gateway integration
+
+---
+
+## Learning Outcomes
+
+Through this project, I learned:
+
+- Distributed system fundamentals
+- Rate limiting strategies
+- Redis data management
+- Atomic operations using Lua scripts
+- Middleware architecture in Express
+- Docker-based deployment
+- Production backend design patterns
+
+---
+
+## Author
+
+**Ajay A**
